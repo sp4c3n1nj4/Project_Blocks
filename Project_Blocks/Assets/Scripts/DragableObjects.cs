@@ -5,18 +5,43 @@ using UnityEngine;
 
 public class DragableObjects : MonoBehaviour
 {
+    public Vector3 mousePosOffset;
+    public float dragSpeed;
+
     private GameObject selectedObject;
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Mouse0))
-        {
-            SelectObject();
-        }
         if (Input.GetKeyUp(KeyCode.Mouse0))
         {
             DeselectObject();
         }
+
+        if (Input.GetKeyDown(KeyCode.Mouse0))
+        {
+            SelectObject();
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        if (Input.GetKey(KeyCode.Mouse0))
+        {
+            MoveSelectedObject();
+        }
+    }
+
+    private void MoveSelectedObject()
+    {
+        if (selectedObject == null)
+            return;
+
+        Rigidbody rb = selectedObject.GetComponent<Rigidbody>();
+
+        Vector3 forceDirection = Camera.main.ScreenToWorldPoint(Input.mousePosition + mousePosOffset) - selectedObject.transform.position;
+        Vector3 targetSpeed = forceDirection / (Time.fixedDeltaTime * dragSpeed);
+
+        rb.AddForce(targetSpeed - rb.velocity, ForceMode.Impulse);
     }
 
     private void SelectObject()
@@ -41,6 +66,8 @@ public class DragableObjects : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawRay(Camera.main.ScreenPointToRay(Input.mousePosition));
+        if (selectedObject == null)
+            return;
+        Gizmos.DrawLine(selectedObject.transform.position, Camera.main.ScreenToWorldPoint(Input.mousePosition + mousePosOffset));
     }
 }
