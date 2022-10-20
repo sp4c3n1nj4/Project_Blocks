@@ -9,6 +9,7 @@ public class DragableObjects : MonoBehaviour
     public float dragSpeed;
 
     private GameObject selectedObject;
+    private Quaternion selectedRotation;
 
     private void Update()
     {
@@ -42,6 +43,7 @@ public class DragableObjects : MonoBehaviour
         Vector3 targetSpeed = forceDirection / (Time.fixedDeltaTime * dragSpeed);
 
         rb.AddForce(targetSpeed - rb.velocity, ForceMode.Impulse);
+        //selectedObject.transform.rotation = selectedRotation;
     }
 
     private void SelectObject()
@@ -53,6 +55,7 @@ public class DragableObjects : MonoBehaviour
             if (hitInfo.transform.gameObject.CompareTag("Moveable"))
             {
                 selectedObject = hitInfo.transform.gameObject;
+                selectedRotation = selectedObject.transform.rotation;
                 print(selectedObject);
             }
         }
