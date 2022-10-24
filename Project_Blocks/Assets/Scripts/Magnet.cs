@@ -20,6 +20,6 @@ public class Magnet : MonoBehaviour
         else
             Gizmos.color = Color.red;
 
-        Gizmos.DrawSphere(transform.position, 0.2f);
+        Gizmos.DrawSphere(transform.position, 0.2f * MagnetForce);
     }
 }
