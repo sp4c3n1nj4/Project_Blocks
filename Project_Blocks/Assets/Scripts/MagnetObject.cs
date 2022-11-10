@@ -4,6 +4,33 @@ using UnityEngine;
 
 public class MagnetObject : MonoBehaviour
 {
+    public readonly static HashSet<Magnet> Pool = new HashSet<Magnet>();
+
+    private void Start()
+    {
+        Magnet[] magnets = FindObjectsOfType<Magnet>();
+        Pool.UnionWith(magnets);
+    }
+
+    public static Magnet FindClosestMagneticPole(GameObject obj)
+    {
+        Magnet result = null;
+        Vector3 pos = obj.transform.position;
+        float dist = float.PositiveInfinity;
+        var e = Pool.GetEnumerator();
+
+        while (e.MoveNext())
+        {
+            float d = (e.Current.transform.position - pos).sqrMagnitude / e.Current.MagnetForce;
+            if (d < dist && !e.Current.gameObject.transform.parent.transform.position.Equals(pos))
+            {
+                result = e.Current;
+                dist = d;
+            }
+        }
+        return result;
+    }
+
     public float MaxForce;
 
     Vector3 CalculateGilbertForce(Magnet magnet1, Magnet magnet2)
@@ -13,7 +40,7 @@ public class MagnetObject : MonoBehaviour
 
         float force = (magnet1.MagnetForce * magnet2.MagnetForce) / Mathf.Pow(distance, 4f);
 
-        if (magnet1.MagneticPole == magnet2.MagneticPole)
+        if (magnet1.magneticPole == magnet2.magneticPole)
             force = -force;
 
         return (force / Time.fixedDeltaTime) * r.normalized;
@@ -28,7 +55,7 @@ public class MagnetObject : MonoBehaviour
             Vector3 desiredForce = Vector3.zero;
 
             for (int j = 0; j < magnets.Length; j++)
-            {               
+            {
                 if (i == j)
                     continue;
 
@@ -40,51 +67,7 @@ public class MagnetObject : MonoBehaviour
 
             desiredForce = Vector3.ClampMagnitude(desiredForce, MaxForce);
 
-            if (desiredForce.magnitude > 0)
-            {
-                Debug.Log(magnets[i]);
-                Debug.Log(desiredForce);
-            }
-
             magnets[i].rigidbody.AddForceAtPosition(desiredForce, magnets[i].transform.position);
         }
     }
-
-    void OnDrawGizmos()
-    {
-        var magnets = FindObjectsOfType<Magnet>();
-
-        for (int i = 0; i < magnets.Length; i++)
-        {
-            var m1 = magnets[i];           
-
-            for (int j = 0; j < magnets.Length; j++)
-            {
-                var m2 = magnets[j];
-
-                if (m1 == m2)
-                    continue;
-
-                if (m2.MagnetForce < 5.0f)
-                    continue;
-
-                if (m1.transform.parent == m2.transform.parent)
-                    continue;
-
-                var f = CalculateGilbertForce(m1, m2);
-
-                if (m2.MagneticPole)
-                {
-                    Gizmos.color = Color.cyan;
-                }
-                else
-                {
-                    Gizmos.color = Color.red;
-                }
-
-                Gizmos.DrawLine(m1.transform.position, m1.transform.position + f);
-            }
-        }
-    }
-
 }
