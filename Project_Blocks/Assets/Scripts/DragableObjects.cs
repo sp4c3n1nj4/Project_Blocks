@@ -9,10 +9,14 @@ public class DragableObjects : MonoBehaviour
     public float dragSpeed;
 
     private GameObject selectedObject;
-    private Quaternion selectedRotation;
+    private GameObject hoverObject;
+    private GameObject lastHoverObject;
 
     private void Update()
     {
+        HoverObject();
+        OutlineHoverObject();
+
         if (Input.GetKeyUp(KeyCode.Mouse0))
         {
             DeselectObject();
@@ -32,6 +36,39 @@ public class DragableObjects : MonoBehaviour
         }
     }
 
+    private void OutlineHoverObject()
+    {
+        if (hoverObject == null && lastHoverObject == null)
+            return;
+        else if (hoverObject == null && lastHoverObject != null)
+        {
+            lastHoverObject.GetComponent<Outline>().enabled = false;
+            lastHoverObject = null;
+        }
+        else if (hoverObject == lastHoverObject)
+            return;
+        else if (hoverObject != null && lastHoverObject == null)
+        {
+            hoverObject.GetComponent<Outline>().enabled = true;
+            lastHoverObject = hoverObject;
+        }      
+    }
+
+    private void HoverObject()
+    {
+        RaycastHit hitInfo;
+
+        if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitInfo, 1000))
+        {
+            if (hitInfo.transform.gameObject.CompareTag("Moveable"))
+            {
+                hoverObject = hitInfo.transform.gameObject;
+            }
+            else
+                hoverObject = null;
+        }
+    }
+
     private void MoveSelectedObject()
     {
         if (selectedObject == null)
@@ -43,21 +80,14 @@ public class DragableObjects : MonoBehaviour
         Vector3 targetSpeed = forceDirection / (Time.fixedDeltaTime * dragSpeed);
 
         rb.AddForce(targetSpeed - rb.velocity, ForceMode.Impulse);
-        //selectedObject.transform.rotation = selectedRotation;
     }
 
     private void SelectObject()
     {
-        RaycastHit hitInfo;
-
-        if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitInfo, 1000))
+        if (hoverObject != null)
         {
-            if (hitInfo.transform.gameObject.CompareTag("Moveable"))
-            {
-                selectedObject = hitInfo.transform.gameObject;
-                selectedRotation = selectedObject.transform.rotation;
-                print(selectedObject);
-            }
+            selectedObject = hoverObject;
+            print(selectedObject);
         }
     }
 

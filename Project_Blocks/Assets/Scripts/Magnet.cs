@@ -33,7 +33,7 @@ public class Magnet : MonoBehaviour
     private void OnDrawGizmos()
     {
         if (magneticPole == MagneticPole.south)
-            Gizmos.color = Color.green;
+            Gizmos.color = Color.blue;
         else if (magneticPole == MagneticPole.north)
             Gizmos.color = Color.red;
         else if (magneticPole == MagneticPole.metal)
