@@ -11,12 +11,13 @@ public class MainMenuManager : MonoBehaviour
     public TextMeshProUGUI targetLevelDisplay;
 
     public int targetLevel = 1;
-    public int maxLevel = 5;
+    public int maxLevel = 4;
 
     private static MainMenuManager _instance;
     public static MainMenuManager Instance { get { return _instance; } }
     private void Awake()
     {
+        DontDestroyOnLoad(this);
         if (_instance != null && _instance != this)
         {
             Destroy(this.gameObject);

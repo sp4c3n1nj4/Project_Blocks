@@ -4,14 +4,19 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {    
-    private bool isMoving;
+    private bool isMoving = false;
 
     [SerializeField]
     private float speed = 1;
     [SerializeField]
     private LevelManager levelManager;
     [SerializeField]
-    private GameObject player;
+    private Rigidbody player;
+
+    private void Awake()
+    {
+        ResetMovement();
+    }
 
     public void StartMovement()
     {
@@ -21,6 +26,7 @@ public class PlayerController : MonoBehaviour
     public void ResetMovement()
     {
         isMoving = false;
+        player.velocity = Vector3.zero;
         player.transform.position = levelManager.startPositions[levelManager.currentLevel - 1];
         player.transform.rotation = levelManager.playerRotations[levelManager.currentLevel - 1];
     }
@@ -33,7 +39,11 @@ public class PlayerController : MonoBehaviour
     private void MovePlayer()
     {
         if (isMoving)
-            player.GetComponent<CharacterController>().Move(levelManager.playerRotations[levelManager.currentLevel - 1] * Vector3.right * speed);
+        {
+            Vector3 desiredVelocity = levelManager.playerRotations[levelManager.currentLevel - 1] * (Vector3.right) * speed;
+            player.AddForce((desiredVelocity - player.velocity) / Time.fixedDeltaTime, ForceMode.Acceleration);
+        }
+            
     }
 
     private void LevelComplete()

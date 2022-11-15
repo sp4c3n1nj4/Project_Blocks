@@ -11,18 +11,22 @@ public class LevelManager : MonoBehaviour
     public Vector3[] startPositions;
     public Quaternion[] playerRotations;
     public CinemachineVirtualCamera[] cameras;
+    public GameObject[] finishLines;
 
-    private static int maxLevel = 5;
+    private static int maxLevel = 4;
 
     private void Start()
     {
+        currentLevel = FindObjectOfType<MainMenuManager>().targetLevel;
         LoadLevel(currentLevel);
     }
 
     public void LoadLevel(int lvl)
     {
         currentLevel = lvl;
-        cameras[lvl - 1].Priority = 100;
+        cameras[lvl - 1].Priority = 10;
+        finishLines[lvl - 1].SetActive(true);
+        FindObjectOfType<PlayerController>().ResetMovement();
     }
 
     public void NextLevel()
@@ -31,8 +35,10 @@ public class LevelManager : MonoBehaviour
             SceneManager.LoadScene(0);
 
         cameras[currentLevel - 1].Priority = 0;
+        finishLines[currentLevel - 1].SetActive(false);
         currentLevel += 1;
-        cameras[currentLevel - 1].Priority = 100;
+        cameras[currentLevel - 1].Priority = 10;
+        finishLines[currentLevel - 1].SetActive(true);
     }
 
 }

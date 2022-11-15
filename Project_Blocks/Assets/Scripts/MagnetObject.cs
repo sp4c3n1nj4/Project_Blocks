@@ -38,7 +38,7 @@ public class MagnetObject : MonoBehaviour
         Vector3 r = magnet2.transform.position - magnet1.transform.position;
         float distance = r.magnitude;
 
-        float force = (magnet1.MagnetForce * magnet2.MagnetForce) / Mathf.Pow(distance, 4f);
+        float force = (magnet1.MagnetForce * magnet2.MagnetForce) / (Mathf.Pow(distance, 4f) + 0.001f);
 
         if (magnet1.magneticPole == magnet2.magneticPole)
             force = -force;
